@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e10054c6-3617-4626-9200-bcbae4e4ba2b" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<flow name="sample-test1Flow" doc:id="27cec687-1b41-45fe-bedf-11aa7fa1dbc4" >
+	<flow name="First" doc:id="27cec687-1b41-45fe-bedf-11aa7fa1dbc4" >
 		<http:listener doc:name="Listener" doc:id="08a28d5c-7895-4170-ad5d-5f28fb919326" config-ref="HTTP_Listener_config" path="/"/>
 		<set-payload value='#[%dw 2.0
 output application/json
@@ -47,12 +47,16 @@ payload]]></ee:set-payload>
 			</on-error-propagate>
 		</error-handler>
 	</flow>
-	<flow name="sample-test1Flow1" doc:id="289def1d-e29d-4cce-8bab-fd64276e8143" >
+	<flow name="Third" doc:id="289def1d-e29d-4cce-8bab-fd64276e8143" >
 		<http:listener doc:name="Listener" doc:id="0eedd282-f95b-4e27-a4fb-ec1156540a12" config-ref="HTTP_Listener_config" path="/3"/>
 		<set-payload value="#[%dw 2.0
 output application/json
 ---
 attributes]" doc:name="Set Payload" doc:id="9eab8cf3-900b-42e9-aae8-278eee72020f" />
 		<logger level="INFO" doc:name="Logger" doc:id="8eefba0f-f922-43d3-a1e1-ae7f46af90ce" message="#[attributes]"/>
+	</flow>
+	<flow name="fourth" doc:id="f15772d2-e9db-4c48-821f-e5a58e430902" >
+		<http:listener doc:name="Listener" doc:id="9041b9cf-80ac-42e7-a404-3cefa114a2af" config-ref="HTTP_Listener_config" path="/4"/>
+		<set-payload value='#["I am Fourth flow"]' doc:name="Set Payload" doc:id="f2e97031-d24f-400f-b200-fa6c911b0a62" />
 	</flow>
 </mule>
