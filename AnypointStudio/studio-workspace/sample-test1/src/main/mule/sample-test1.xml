@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e10054c6-3617-4626-9200-bcbae4e4ba2b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="sample-test1Flow" doc:id="27cec687-1b41-45fe-bedf-11aa7fa1dbc4" >
+		<http:listener doc:name="Listener" doc:id="08a28d5c-7895-4170-ad5d-5f28fb919326" config-ref="HTTP_Listener_config" path="/"/>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+{	"Status" : 200,
+	"Message" : "Request Success.."
+}]' doc:name="Set Payload" doc:id="baf03fa3-b603-46f8-8f68-eabc42860d1e"/>
+	</flow>
+	<flow name="second" doc:id="2b553548-63c9-411c-8859-43e1151d5e7d" >
+		<http:listener doc:name="Listener" doc:id="c854e941-559d-4a67-80ce-9102e020f33e" config-ref="HTTP_Listener_config" path="/2" outputMimeType="application/json"/>
+		<choice doc:name="Choice" doc:id="6125857a-59df-479b-9d94-2bc4e8d0bb4b" >
+			<when expression='#[attributes.remoteAddress == "/127.0.0.1:5975"]'>
+				<try doc:name="Try" doc:id="cb1d81cb-94c1-41e4-b360-329d4ae8f2bf" >
+					<set-payload value='#[{
+	"Status" : "Successfully processed GET Method"
+}]' doc:name="Set Payload" doc:id="a0035e14-558b-4272-9995-4248327d81dd" />
+				</try>
+			</when>
+			<otherwise >
+				<set-payload value='#[{
+	"Status" : "This is the Default Scope"
+}]' doc:name="Set Payload" doc:id="33dfc21d-cb18-42f8-a0ac-140d3a4162a5" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="9aeb24ee-f13c-4343-bf37-2a66a9073bf8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9e79dd4f-d3e6-4913-b3f8-50d44e3847c8" >
+				<set-payload value="#[error.description]" doc:name="Set Payload" doc:id="a7425b73-ac9b-40c7-903d-31c7f8cdb316" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="sample-test1Flow1" doc:id="289def1d-e29d-4cce-8bab-fd64276e8143" >
+		<http:listener doc:name="Listener" doc:id="0eedd282-f95b-4e27-a4fb-ec1156540a12" config-ref="HTTP_Listener_config" path="/3"/>
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+attributes]" doc:name="Set Payload" doc:id="9eab8cf3-900b-42e9-aae8-278eee72020f" />
+		<logger level="INFO" doc:name="Logger" doc:id="8eefba0f-f922-43d3-a1e1-ae7f46af90ce" message="#[attributes]"/>
+	</flow>
+</mule>
